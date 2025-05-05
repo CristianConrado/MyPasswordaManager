@@ -2,7 +2,7 @@ import tkinter as tk
 import ctypes
 import tkinter.messagebox as messagebox
 lib = ctypes.CDLL("./database.so")
-
+lib.wrapping_checkSite.restype = ctypes.py_object
 
 def create_password_manager_main_window():
     main = tk.Tk() #Main window
@@ -65,7 +65,8 @@ def signUp_user(main,user, pw):
 
 
 def create_password_manager_loggedIn_window(main, user, pw):
-    if(not lib.checkUser(user.encode('utf-8'), pw.encode('utf-8'))): # Check if the user is in the database ENCODE TO SEND TO C
+    res = lib.checkUser(user.encode('utf-8'), pw.encode('utf-8'))
+    if(not res): # Check if the user is in the database ENCODE TO SEND TO C
         messagebox.showerror("Error", "Invalid username or password")
         return
     
@@ -77,8 +78,7 @@ def create_password_manager_loggedIn_window(main, user, pw):
     LoggedIn.configure(bg="lightblue")  # Set the background color
     LoggedIn.configure(padx=20, pady=20)
 
-    tk.Button(LoggedIn, text="Check", command=lambda:create_password_manager_checkPassword_window(LoggedIn)).grid(padx= 100)  # Check button TODO: Check if the website is already in the file 
-                                                                                                        #and if it is, show the password
+    tk.Button(LoggedIn, text="Check", command=lambda:create_password_manager_checkPassword_window(LoggedIn,res)).grid(padx= 100) 
     tk.Button(LoggedIn, text="Create", command=lambda:create_password_manager_createPassword_window(LoggedIn)).grid(pady= 30) 
 
     LoggedIn.mainloop()
@@ -99,10 +99,11 @@ def create_password_manager_createPassword_window(main):
     #TODO: Save the password to a file
     create.mainloop()
 
-def create_password_manager_checkPassword_window(main):
+def create_password_manager_checkPassword_window(main,id):
+    print(id)
     main.destroy() # Destroy the main window
     check = tk.Tk() #signUp window
-    check.title("New Password")
+    check.title("Look for Password")
     check.geometry("300x200")  # Set the window size
     check.resizable(True,True)
     check.configure(bg="lightblue")  # Set the background color
@@ -111,12 +112,35 @@ def create_password_manager_checkPassword_window(main):
     tk.Label(check, bg= "lightblue",text="Site:").grid(row=1, column=0)
     site = tk.Entry(check)
     site.grid(row=1, column=1)
-    tk.Button(check, text="Check", command=lambda: read_entry_text(site)).grid(column = 1, row=2)  # Check button TODO: Check if the website is already in the file
+    tk.Button(check, text="Check", command=lambda:create_password_manager_writePassword_window(main,site.get(),id)).grid(column = 1, row=2)  # Check button TODO: Check if the website is already in the file
     #TODO: show the password from the file
     check.mainloop()
 
 def read_entry_text(entry):
     return entry.get()
+
+def create_password_manager_writePassword_window(main, site, id):  # Output the password FROM the database
+    if site == "":
+        messagebox.showerror("Error", "Please enter a site")
+        return
+    password = lib.wrapping_checkSite(site.encode('utf-8'), str(id).encode('utf-8'))
+    if password == b' ' :  # Check if the site is in the database
+        messagebox.showerror("Error", "No password found for this site")
+        return
+    # Create a new window to display the password
+    write = tk.Tk()
+    write.title("Password")
+    write.geometry("300x200")  # Set the window size
+    write.resizable(True, True)
+    write.configure(bg="lightblue")  # Set the background color
+    write.configure(padx=20, pady=20)
+    tk.Label(write, bg="lightblue", text="Site:").grid(row=1, column=0)
+    tk.Label(write, bg="lightblue", text=site).grid(row=1, column=1)  # Display the site
+    tk.Label(write, bg="lightblue", text="Password:").grid(row=2, column=0)
+    tk.Label(write, bg="lightblue", text=password).grid(row=2, column=1)  # Display the password
+
+
+    write.mainloop()
 
 if __name__ == "__main__":
     create_password_manager_main_window()
