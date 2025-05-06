@@ -1,0 +1,26 @@
+Things I learned:
+  Using Python-Tkinter:
+  - A bit of a problem in the beggining getting used to everything but it has similar arguments to CSS in order to assing color, fonts, padding etc.
+  - Python is simple yet effective, I think it has some things I like less than C/C++ or C# (maybe its because I am more familiar with those) but its a language that doesn't give you a hard time. I would probably use it again in another project.
+
+  Communicating C <-> Python:
+  - Passing a char* from C to Python is complicated to do safely freeing afterwards the pointer, solution found: 
+    Using Python Library in C and "Wrapping" the original C function with another function so I can free the pointer in C and send back a PyObject which Pyhton will turn into a string.
+
+  Communicating C <-> SQLite:
+  - How to query, pass values, receive values from SQLite in C. Some things are similar to Quering from JAVA as I have done in Uni(Not a lot really), but there are more calls in order to pass values and receive I feel.
+    Luckily tables being so easy there are no difficoult queries.
+
+  Communicating C <-> GO:
+  - TBD
+
+  Communicating Python <-> Go <-> C
+  - TBD
+
+  Using Go for the first time:
+  - TBD
+
+  Creating Passwords with Go:
+  - TBD
+
+  
