@@ -4,141 +4,150 @@ import tkinter.messagebox as messagebox
 lib = ctypes.CDLL("./database.so")
 lib.wrapping_checkSite.restype = ctypes.py_object
 
+import tkinter as tk
+
+def setUpWindow(main):
+    pantalla_ancho = main.winfo_screenwidth()
+    pantalla_alto = main.winfo_screenheight()
+
+    x = (pantalla_ancho // 2) - (800 // 2)
+    y = (pantalla_alto // 2) - (600 // 2)
+    main.geometry(f"{800}x{600}+{x}+{y}")
+    main.configure(bg='#7395AE', padx=20, pady=20)
+
+    # Configure grid weights to center widgets
+    main.grid_columnconfigure(0, weight=1)
+    main.grid_columnconfigure(1, weight=1)
+    main.grid_columnconfigure(2, weight=1)
+    main.resizable(0, 0)
+
+
+
 def create_password_manager_main_window():
-    main = tk.Tk() #Main window
+    main = tk.Tk()  # Main window
     main.title("Password Manager")
-    main.geometry("300x200")  # Set the window size
-    main.resizable(True,True)
-    main.configure(bg="lightblue")  # Set the background color
-    main.configure(padx=20, pady=20) 
-    res =lib.connect_to_database() # Connect to the database
+    setUpWindow(main)
 
-    tk.Label(main, text="Password Manager",background="lightblue").grid(row=0, column=1,) # Title label
+    # Title label
+    title = tk.Label(main, text="Password Manager", font=("TimesNewRoman", 24), bg='#7395AE', fg='#303C6C')
+    title.grid(row=0, column=0, columnspan=3, pady=(20, 40), sticky="n")
 
-    tk.Label(main, text="Username",background="lightblue").grid(row=1, column=0)  # Username label
-    user = tk.Entry(main)
-    user.grid(row=1, column=1)
+    # Username
+    tk.Label(main, text="Username", bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=2, column=1, sticky="w", padx=5, pady=5)
+    user = tk.Entry(main, border=0,fg='#303C6C', font="TimesNewRoman")
+    user.grid(row=2, column=1, padx=5, pady=5)
 
-    tk.Label(main, text="Password",background="lightblue").grid(row=2, column=0)  # Password label
-    pw = tk.Entry(main, show="*")
-    pw.grid(row=2, column=1)
+    # Password
+    tk.Label(main, text="Password", bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=4, column=1, sticky="w", padx=5, pady=5)
+    pw = tk.Entry(main, show="*",border=0,fg='#303C6C', font="TimesNewRoman")
+    pw.grid(row=4, column=1, padx=5, pady=5)
 
-    tk.Button(main, text="Login", command=lambda: create_password_manager_loggedIn_window(main,user.get(),pw.get())).grid(row=3, column=1)  # Login button
-    tk.Button(main, text="Sign Up", command=lambda:create_password_manager_Sign_Up_window(main)).grid(row=3, column=0)  # Login button
-    
+    # Buttons
+    tk.Button(main, text="Login", command=lambda: create_password_manager_loggedIn_window(main, user.get(), pw.get()), fg="white",border=0, font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=5, column=1, pady=(20, 5))
+    tk.Button(main, text="Sign Up", command=lambda: create_password_manager_Sign_Up_window(main), fg="white",border=0, font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=6, column=1, pady=5)
 
     main.mainloop()
 
+
 def create_password_manager_Sign_Up_window(main):
-    main.destroy() # Destroy the main window
-    signUp = tk.Tk() #signUp window
+    main.destroy()
+    signUp = tk.Tk()
     signUp.title("Sign Up")
-    signUp.geometry("300x200")  # Set the window size
-    signUp.resizable(True,True)
-    signUp.configure(bg="lightblue")  # Set the background color
-    signUp.configure(padx=20, pady=20) 
+    setUpWindow(signUp)
 
-    tk.Label(signUp, text="Enter your user",background="lightblue").grid(row=0, column=1,) # Title label
+    tk.Label(signUp, text="Create a New Account", font=("TimesNewRoman", 16), bg='#7395AE').grid(row=0, column=0, columnspan=3, pady=(10, 20))
 
-    tk.Label(signUp, text="Username",background="lightblue").grid(row=1, column=0)  # Username label
-    user = tk.Entry(signUp)
-    user.grid(row=1, column=1)
-    #TODO: Check if the username is already in the file
+    tk.Label(signUp, text="Username:", bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=2, column=1, sticky="w")
+    user = tk.Entry(signUp,border=0,fg='#303C6C', font="TimesNewRoman")
+    user.grid(row=2, column=1, pady=(0, 10))
 
-    tk.Label(signUp, text="Password",background="lightblue").grid(row=2, column=0)  # Password label
-    pw = tk.Entry(signUp, show="*")
-    pw.grid(row=2, column=1)
+    tk.Label(signUp, text="Password:", bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=4, column=1, sticky="w")
+    pw = tk.Entry(signUp, show="*",border=0,fg='#303C6C', font="TimesNewRoman")
+    pw.grid(row=4, column=1, pady=(0, 20))
 
-    
-    tk.Button(signUp, text="Sign Up", command=lambda: signUp_user(signUp,user.get(),pw.get())).grid(row=3, column=1)  # Login button
+    tk.Button(signUp, text="Sign Up", command=lambda: signUp_user(signUp, user.get(), pw.get()), fg="white",border=0, font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=5, column=1)
 
     signUp.mainloop()
 
-def signUp_user(main,user, pw):
-    if(lib.checkUser(user.encode('utf-8'), pw.encode('utf-8'))): # Check if the user is in the database ENCODE TO SEND TO C
+def signUp_user(main, user, pw):
+    if lib.checkUser(user.encode('utf-8'), pw.encode('utf-8')):
         messagebox.showerror("Error", "User already exists")
         return
-    print(user,pw)
-    lib.addUser(user.encode('utf-8'), pw.encode('utf-8')) # Add the user to the database ENCODE TO SEND TO C
-
-    create_password_manager_loggedIn_window(main, user, pw) # Create the logged in window
-
+    lib.addUser(user.encode('utf-8'), pw.encode('utf-8'))
+    create_password_manager_loggedIn_window(main, user, pw)
 
 def create_password_manager_loggedIn_window(main, user, pw):
     res = lib.checkUser(user.encode('utf-8'), pw.encode('utf-8'))
-    if(not res): # Check if the user is in the database ENCODE TO SEND TO C
+    if not res:
         messagebox.showerror("Error", "Invalid username or password")
         return
-    
-    main.destroy() # Destroy the main window
-    LoggedIn = tk.Tk() #signUp window
-    LoggedIn.title("Password Manager")
-    LoggedIn.geometry("300x200")  # Set the window size
-    LoggedIn.resizable(True,True)
-    LoggedIn.configure(bg="lightblue")  # Set the background color
-    LoggedIn.configure(padx=20, pady=20)
 
-    tk.Button(LoggedIn, text="Check", command=lambda:create_password_manager_checkPassword_window(LoggedIn,res)).grid(padx= 100) 
-    tk.Button(LoggedIn, text="Create", command=lambda:create_password_manager_createPassword_window(LoggedIn)).grid(pady= 30) 
+    main.destroy()
+    LoggedIn = tk.Tk()
+    setUpWindow(LoggedIn)
+    tk.Label(LoggedIn, text="Welcome " + user+"!", labelArgs()).grid(row=0, column=0, columnspan=3, pady=(10, 30))
+
+    tk.Button(LoggedIn, text="Check Password", width=20, command=lambda: create_password_manager_checkPassword_window(LoggedIn, res,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=1, column=1, pady=10)
+    tk.Button(LoggedIn, text="Create Password", width=20, command=lambda: create_password_manager_createPassword_window(LoggedIn,res,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=2, column=1, pady=10)
 
     LoggedIn.mainloop()
 
-def create_password_manager_createPassword_window(main):
-    main.destroy() # Destroy the main window
-    create = tk.Tk() #signUp window
-    create.title("New Password")
-    create.geometry("300x200")  # Set the window size
-    create.resizable(True,True)
-    create.configure(bg="lightblue")  # Set the background color
-    create.configure(padx=20, pady=20)
-
-    tk.Label(create, bg= "lightblue",text="Site:").grid(row=1, column=0)
-    site = tk.Entry(create)
+def create_password_manager_createPassword_window(main,id,user,pw):
+    main.destroy()
+    create = tk.Tk()
+    create.title("Create New Password")
+    setUpWindow(create)
+    tk.Button(create, text="Back", command=lambda: create_password_manager_loggedIn_window(create,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=0, column=0)
+    tk.Label(create, text="New Site:",bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=1, column=1, sticky="w")
+    site = tk.Entry(create,border=0,fg='#303C6C', font="TimesNewRoman")
     site.grid(row=1, column=1)
-    tk.Button(create, text="Create", command=lambda: read_entry_text(site)).grid(column = 1, row=2)  # Check button TODO: Check if the website is already in the file
-    #TODO: Save the password to a file
+
+    tk.Button(create, text="Create", command=lambda: site.get(), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=2, column=1,pady=20)
+
     create.mainloop()
 
-def create_password_manager_checkPassword_window(main,id):
-    print(id)
-    main.destroy() # Destroy the main window
-    check = tk.Tk() #signUp window
-    check.title("Look for Password")
-    check.geometry("300x200")  # Set the window size
-    check.resizable(True,True)
-    check.configure(bg="lightblue")  # Set the background color
-    check.configure(padx=20, pady=20)
+def create_password_manager_checkPassword_window(main, id,user,pw):
+    main.destroy()
+    
+    check = tk.Tk()
+    check.title("Look Up Password")
+    tk.Button(check, text="Back", command=lambda: create_password_manager_loggedIn_window(check,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=0, column=0)
+    setUpWindow(check)
+    check.grid_rowconfigure(0, weight=1)  # Top spacer
+    check.grid_rowconfigure(3, weight=1)  # Bottom spacer
+    tk.Label(check, text="Enter Site:",bg='#7395AE',fg='#303C6C', font="TimesNewRoman").grid(row=0, column=1, sticky="w")
+    site = tk.Entry(check,border=0,fg='#303C6C', font="TimesNewRoman", width=15)
+    site.grid(row=0, column=1)
+    
+    tk.Button(check, text="Check", command=lambda: create_password_manager_writePassword_window(check, site.get(), id,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=1, column=1,pady=20)
 
-    tk.Label(check, bg= "lightblue",text="Site:").grid(row=1, column=0)
-    site = tk.Entry(check)
-    site.grid(row=1, column=1)
-    tk.Button(check, text="Check", command=lambda:create_password_manager_writePassword_window(main,site.get(),id)).grid(column = 1, row=2)  # Check button TODO: Check if the website is already in the file
-    #TODO: show the password from the file
     check.mainloop()
 
-def read_entry_text(entry):
-    return entry.get()
 
-def create_password_manager_writePassword_window(main, site, id):  # Output the password FROM the database
+
+def create_password_manager_writePassword_window(main, site, id,user,pw):
     if site == "":
         messagebox.showerror("Error", "Please enter a site")
         return
     password = lib.wrapping_checkSite(site.encode('utf-8'), str(id).encode('utf-8'))
-    if password == b' ' :  # Check if the site is in the database
+    if password == "":
         messagebox.showerror("Error", "No password found for this site")
         return
-    # Create a new window to display the password
-    write = tk.Tk()
-    write.title("Password")
-    write.geometry("300x200")  # Set the window size
-    write.resizable(True, True)
-    write.configure(bg="lightblue")  # Set the background color
-    write.configure(padx=20, pady=20)
-    tk.Label(write, bg="lightblue", text="Site:").grid(row=1, column=0)
-    tk.Label(write, bg="lightblue", text=site).grid(row=1, column=1)  # Display the site
-    tk.Label(write, bg="lightblue", text="Password:").grid(row=2, column=0)
-    tk.Label(write, bg="lightblue", text=password).grid(row=2, column=1)  # Display the password
 
+    main.destroy()
+    write = tk.Tk()
+    write.title("Your Password")
+    setUpWindow(write)
+    tk.Button(write, text="Back", command=lambda: create_password_manager_checkPassword_window(write,id,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=0, column=0)
+    write.grid_rowconfigure(0, weight=1)  # Top spacer
+    write.grid_rowconfigure(3, weight=1)  # Bottom spacer
+
+    tk.Label(write, text="Site:", bg='#7395AE',fg='#303C6C', font=("TimesNewRoman",16)).grid(row=0, column=0, sticky="e")
+    tk.Label(write, text=site, bg='#7395AE',fg='#303C6C', font=("TimesNewRoman",16)).grid(row=0, column=1, sticky="w")
+
+    tk.Label(write, text="Password:", bg='#7395AE',fg='#303C6C', font=("TimesNewRoman",16)).grid(row=1, column=0, sticky="e")
+    tk.Label(write, text=" "+password, bg='#7395AE',fg='#303C6C', font=("TimesNewRoman",16)).grid(row=1, column=1, sticky="w")
+   
 
     write.mainloop()
 
