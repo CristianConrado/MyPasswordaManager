@@ -3,7 +3,7 @@ import ctypes
 import tkinter.messagebox as messagebox
 lib = ctypes.CDLL("./database.so")
 lib.wrapping_checkSite.restype = ctypes.py_object
-
+lib2 = ctypes.CDLL("./libpasswordcreator.so")
 import tkinter as tk
 
 def setUpWindow(main):
@@ -85,7 +85,7 @@ def create_password_manager_loggedIn_window(main, user, pw):
     main.destroy()
     LoggedIn = tk.Tk()
     setUpWindow(LoggedIn)
-    tk.Label(LoggedIn, text="Welcome " + user+"!", labelArgs()).grid(row=0, column=0, columnspan=3, pady=(10, 30))
+    tk.Label(LoggedIn, text="Welcome " + user+"!").grid(row=0, column=0, columnspan=3, pady=(10, 30))
 
     tk.Button(LoggedIn, text="Check Password", width=20, command=lambda: create_password_manager_checkPassword_window(LoggedIn, res,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=1, column=1, pady=10)
     tk.Button(LoggedIn, text="Create Password", width=20, command=lambda: create_password_manager_createPassword_window(LoggedIn,res,user,pw), fg="white",border="0", font="TimesNewRoman", bg= '#4D6D9A', relief="sunken").grid(row=2, column=1, pady=10)
@@ -124,7 +124,6 @@ def create_password_manager_checkPassword_window(main, id,user,pw):
     check.mainloop()
 
 
-
 def create_password_manager_writePassword_window(main, site, id,user,pw):
     if site == "":
         messagebox.showerror("Error", "Please enter a site")
@@ -150,6 +149,11 @@ def create_password_manager_writePassword_window(main, site, id,user,pw):
    
 
     write.mainloop()
+
+
+def create_password_manager_CreatePassword(site, id):
+    lib.createPasswordPy(site,id)
+    tk.messagebox.showinfo("Success", "Password created successfully")
 
 if __name__ == "__main__":
     create_password_manager_main_window()
