@@ -12,15 +12,12 @@ Things I learned:
     Luckily tables being so easy there are no difficoult queries.
 
   Communicating C <-> GO:
-  - TBD
-
-  Communicating Python <-> Go <-> C
-  - TBD
+  - How to compile a Go file and getting to use the Go functions from C. It was easier than I thought it would be.
 
   Using Go for the first time:
-  - TBD
+  - Pretty similar to C in terms of syntax and how to define things, also reminded me of Zig or Rust because of having to add the return value in the end instead of defining it at the begining like in C/C++.
 
   Creating Passwords with Go:
-  - TBD
+  - I decided to make use of random passwords instead of hashed passphrases for example as it is harder to brute force attack.
 
   
